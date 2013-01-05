@@ -13,8 +13,12 @@ hnlCptCodes=dict()
 totalExpected=0
 totalActual=0
 
+
 #direct bill stuff 
 directBillDoctors=['Cornfield','Gheith']
+ratesHNL=dict()
+cptCodesHNL=dict()
+totalDirectBill=0
 
 def isDirectBill(doctorstring):
 	for doc in directBillDoctors:
@@ -33,7 +37,19 @@ def showExpectedAndActual():
 			totalActual += cptCodesCollected[k]
 	print '\t'+"{0:.2f}".format(totalExpected).rjust(7)+'\t'+"{0:.2f}".format(totalActual).rjust(7)
 	
-
+def showDirectBill():
+	global totalDirectBill
+	for k,v in cptCodesHNL.items():
+		if v!=0:
+			print k+'\t'+"{0:.2f}".format(v)
+			totalDirectBill +=v
+	print '\t'+"{0:.2f}".format(totalDirectBill)
+	
+	
+def tallyUpDirectBill(cptcode):
+	real=ratesHNL.get(cptcode)
+	if real != None:
+		cptCodesHNL[cptcode] += float(real)
 
 
 
@@ -56,7 +72,7 @@ else:
 	sys.exit()
 
 
-	
+#read expected and actual for payor rates	
 reportReader=csv.reader(open(filename,'rb'),delimiter=',',quotechar='\'')
 reportReader.next()
 
@@ -67,18 +83,39 @@ for row in reportReader:
 	cptCodes[row[0]]=0
 	cptCodesCollected[row[0]]=0
 	
+#read direct bill file rates
+rr=csv.reader(open(hnlRates,'rb'),delimiter=',',quotechar='\'')
+
+for row in rr:
+	ratesHNL[row[0]]=row[1]
+	cptCodesHNL[row[0]]=0
+	
 	
 reportReader2=csv.reader(open(hl7file,'rU'),delimiter='|',quotechar='\'')
 reportReader2.next()
 
 for row in reportReader2:
+	if row[0]=='PV1':
+		if isDirectBill(row[7]):
+			DirectBill=True
+		else:
+			DirectBill=False
 	if row[0]=='FT1' and row[7].isdigit():
-		tallyUp(row[7])
+		if DirectBill==False:
+			tallyUp(row[7])
+		else:
+			tallyUpDirectBill(row[7])
+	
 	#if row[0]=='PV1':
 	#	print row[7],isDirectBill(row[7])
 		
+print "Payor Expected and Actual"
 print "CPT"+'\t'+"Expected"+'\t'+"Actual"
 showExpectedAndActual()
+print
+print "Direct Bill HNL"
+print "CPT"+'\t'+"Actual"
+showDirectBill()
 
 
 	
