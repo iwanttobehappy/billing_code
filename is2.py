@@ -14,12 +14,19 @@ totalExpected=0
 totalActual=0
 
 
-#direct bill stuff 
+#direct bill stuff HNL
 directBillDoctors=['Cornfield','Gheith']
 ratesHNL=dict()
 cptCodesHNL=dict()
-totalDirectBill=0
+totalDirectBillHNL=0
 unpricedCPT=set()
+
+#direct bill stuff UIowa Tricot
+directBillDoctorsIowa=['Tricot']
+ratesIowa=dict()
+cptCodesIowa=dict()
+totalDirectBillIowa=0
+unpricedCPTIowa=set()
 
 def isDirectBill(doctorstring):
 	for doc in directBillDoctors:
@@ -38,16 +45,16 @@ def showExpectedAndActual():
 			totalActual += cptCodesCollected[k]
 	print '\t'+"{0:.2f}".format(totalExpected).rjust(7)+'\t'+"{0:.2f}".format(totalActual).rjust(7)
 	
-def showDirectBill():
-	global totalDirectBill
+def showDirectBillHNL():
+	global totalDirectBillHNL
 	for k,v in cptCodesHNL.items():
 		if v!=0:
 			print k+'\t'+"{0:.2f}".format(v)
-			totalDirectBill +=v
-	print '\t'+"{0:.2f}".format(totalDirectBill)
+			totalDirectBillHNL +=v
+	print '\t'+"{0:.2f}".format(totalDirectBillHNL)
 	
 	
-def tallyUpDirectBill(cptcode):
+def tallyUpDirectBillHNL(cptcode):
 	real=ratesHNL.get(cptcode)
 	if real != None:
 		cptCodesHNL[cptcode] += float(real)
@@ -107,7 +114,7 @@ for row in reportReader2:
 		if DirectBill==False:
 			tallyUp(row[7])
 		else:
-			tallyUpDirectBill(row[7])
+			tallyUpDirectBillHNL(row[7])
 	
 	#if row[0]=='PV1':
 	#	print row[7],isDirectBill(row[7])
@@ -118,7 +125,7 @@ showExpectedAndActual()
 print
 print "Direct Bill HNL"
 print "CPT"+'\t'+"Actual"
-showDirectBill()
+showDirectBillHNL()
 print "Unpriced CPT's for direct bill"
 print unpricedCPT
 
