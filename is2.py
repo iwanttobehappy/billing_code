@@ -19,6 +19,7 @@ directBillDoctors=['Cornfield','Gheith']
 ratesHNL=dict()
 cptCodesHNL=dict()
 totalDirectBill=0
+unpricedCPT=set()
 
 def isDirectBill(doctorstring):
 	for doc in directBillDoctors:
@@ -50,6 +51,8 @@ def tallyUpDirectBill(cptcode):
 	real=ratesHNL.get(cptcode)
 	if real != None:
 		cptCodesHNL[cptcode] += float(real)
+	else:
+		unpricedCPT.add(cptcode)
 
 
 
@@ -116,6 +119,8 @@ print
 print "Direct Bill HNL"
 print "CPT"+'\t'+"Actual"
 showDirectBill()
+print "Unpriced CPT's for direct bill"
+print unpricedCPT
 
 
 	
